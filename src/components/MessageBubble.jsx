@@ -44,7 +44,11 @@ function MessageBubble({ msg }) {
               <p className="leading-relaxed">{msg.text}</p>
             ) : (
               <div className="space-y-3">
-                <p className="leading-relaxed whitespace-pre-wrap">{msg.answer}</p>
+                <p
+                  className="leading-relaxed whitespace-pre-wrap"
+                  // LLM answers may contain HTML (<br>, tables, etc.)
+                  dangerouslySetInnerHTML={{ __html: msg.answer }}
+                />
                 
                 {/* Meta Information for Bot Response */}
                 <div className="pt-2 mt-2 border-t border-gray-50 dark:border-slate-700 flex flex-wrap gap-2">

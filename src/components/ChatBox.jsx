@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import MessageBubble from "./MessageBubble";
 import { cn } from "../utils";
 
-function ChatBox({ subject }) {
+function ChatBox({ subject, noteIds }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -19,20 +19,40 @@ function ChatBox({ subject }) {
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
+    if (!noteIds || noteIds.length === 0) {
+      setMessages(prev => [
+        ...prev,
+        {
+          type: "bot",
+          answer: "Please upload and confirm your notes first, then try again.",
+        },
+      ]);
+      return;
+    }
+
     const userMsg = { type: "user", text: input };
     setMessages(prev => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/ask", {
+      const res = await fetch("http://localhost:3000/chat/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: input, subject }),
+        credentials: "include",
+        body: JSON.stringify({ noteIds }),
       });
 
       const data = await res.json();
-      setMessages(prev => [...prev, { type: "bot", ...data }]);
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Failed to generate questions");
+      }
+
+      setMessages(prev => [
+        ...prev,
+        { type: "bot", answer: data.questions },
+      ]);
     } catch (error) {
       console.error("Chat failed:", error);
       setMessages(prev => [...prev, { 

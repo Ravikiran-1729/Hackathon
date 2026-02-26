@@ -1,10 +1,4 @@
 // src/services/llm.service.js
-const OpenAI = require("openai");
-
-const client = new OpenAI({
-    apiKey: process.env.OPENAI_KEY
-});
-
 exports.generateQuestions = async (text) => {
     try {
         console.log("🤖 [LLM] Sending text length:", text.length);
@@ -26,17 +20,47 @@ ${text.slice(0, 12000)}
 </CONTENT>
 `;
 
-        const response = await client.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [{ role: "user", content: prompt }],
-        });
+        // Call external n8n workflow instead of local generation
+        const reqBody = {
+            sessionId: "notes-session",
+            action: "generateQuestions",
+            chatInput: prompt,
+        };
 
-        if (!response.choices || !response.choices[0]?.message?.content) {
-            throw new Error("Invalid response from LLM");
+        const res = await fetch(
+            "https://ravikiran-1729.app.n8n.cloud/webhook/professionalAssist",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(reqBody),
+            }
+        );
+
+        if (!res.ok) {
+            const errorText = await res.text().catch(() => "");
+            console.error("🔥 [LLM] n8n error:", res.status, errorText);
+            throw new Error(`n8n request failed with status ${res.status}`);
         }
 
-        console.log("🤖 [LLM] Response received");
-        return response.choices[0].message.content;
+        const data = await res.json().catch(() => ({}));
+
+        // Prefer structured 'output' from n8n
+        const raw =
+            data.output ||
+            data.answer ||
+            data.response ||
+            data.result ||
+            data.questions ||
+            (typeof data === "string" ? data : JSON.stringify(data, null, 2));
+
+        // Convert newlines to <br> so the frontend can render
+        // nicely formatted questions and options via innerHTML.
+        const html = raw.replace(/\n/g, "<br>");
+
+        console.log("🤖 [LLM] n8n response received");
+        return html;
 
     } catch (err) {
         console.error("🔥 [LLM] Error:", err.message);

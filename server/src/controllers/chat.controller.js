@@ -10,7 +10,6 @@ exports.generateFromNotes = async (req, res) => {
         console.log("💬 [CHAT] Request received");
 
         const { noteIds } = req.body;
-        const userId = req.user._id; // from JWT
 
         // ✅ Guard: validate input
         if (!Array.isArray(noteIds) || noteIds.length === 0) {
@@ -33,12 +32,6 @@ exports.generateFromNotes = async (req, res) => {
         let combinedText = "";
 
         for (const note of notes) {
-            // ✅ Ownership enforcement
-            if (!note.subjectId || note.subjectId.userId.toString() !== userId.toString()) {
-                console.warn(`⚠️ [CHAT] User not authorized for note: ${note._id}`);
-                continue;
-            }
-
             if (!note.extractedText) {
                 console.log("🧠 [CHAT] Extracting:", note.fileName);
 

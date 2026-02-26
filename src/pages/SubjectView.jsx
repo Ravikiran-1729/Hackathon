@@ -12,12 +12,14 @@ function SubjectView() {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState(null);
   const [isNotesConfirmed, setIsNotesConfirmed] = useState(false);
+  const [noteIds, setNoteIds] = useState([]);
 
   // Capitalize subject name for display
   const displaySubject = subjectName.charAt(0).toUpperCase() + subjectName.slice(1);
 
-  const handleUploadSuccess = (fileName) => {
-    setUploadedFileName(fileName);
+  const handleUploadSuccess = (ids) => {
+    setUploadedFileName(`${ids.length} file(s)`);
+    setNoteIds(ids);
   };
 
   return (
@@ -117,7 +119,7 @@ function SubjectView() {
                   />
                 )}
                 {isNotesConfirmed && (
-                  <ChatBox subject={displaySubject} />
+                  <ChatBox subject={displaySubject} noteIds={noteIds} />
                 )}
               </div>
               <div className="lg:col-span-5">
