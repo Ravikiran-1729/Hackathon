@@ -1,10 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import SubjectView from "./pages/SubjectView";
-import { GraduationCap, LayoutDashboard, Settings, User as UserIcon, LogOut } from "lucide-react";
+import About from "./pages/About";
+import Auth from "./pages/Auth";
+import SettingsPage from "./pages/Settings";
+import { GraduationCap, LayoutDashboard, Settings, User as UserIcon, LogOut, Info, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "./utils";
 import TopNav from "./components/TopNav";
+
 
 function Sidebar() {
   const location = useLocation();
@@ -31,10 +35,42 @@ function Sidebar() {
           <LayoutDashboard size={20} />
           <span>Dashboard</span>
         </Link>
-        <button className="flex items-center gap-3 w-full p-3 rounded-xl text-gray-400 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-600 dark:hover:text-slate-300 transition-all">
+        <Link 
+          to="/about" 
+          className={cn(
+            "flex items-center gap-3 w-full p-3 rounded-xl font-semibold transition-all",
+            location.pathname === "/about" 
+              ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" 
+              : "text-gray-400 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-600 dark:hover:text-slate-300"
+          )}
+        >
+          <Info size={20} />
+          <span>About</span>
+        </Link>
+        <Link 
+          to="/auth" 
+          className={cn(
+            "flex items-center gap-3 w-full p-3 rounded-xl font-semibold transition-all",
+            location.pathname === "/auth" 
+              ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" 
+              : "text-gray-400 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-600 dark:hover:text-slate-300"
+          )}
+        >
+          <ShieldCheck size={20} />
+          <span>Authentication</span>
+        </Link>
+        <Link 
+          to="/settings" 
+          className={cn(
+            "flex items-center gap-3 w-full p-3 rounded-xl font-semibold transition-all",
+            location.pathname === "/settings" 
+              ? "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" 
+              : "text-gray-400 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-600 dark:hover:text-slate-300"
+          )}
+        >
           <Settings size={20} />
           <span>Settings</span>
-        </button>
+        </Link>
       </nav>
 
       <div className="mt-auto space-y-4">
@@ -69,8 +105,19 @@ function App() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto">
-          <div className="max-w-5xl mx-auto">
+        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto relative">
+          {/* Background Image with low opacity */}
+          <div 
+            className="absolute inset-0 z-0 pointer-events-none opacity-[0.09] dark:opacity-[0.09]"
+            style={{
+              backgroundImage: `url('https://images.prismic.io/intuzwebsite/d9daef05-a416-4e84-b0f8-2d5e2e3b58d8_A+Comprehensive+Guide+to+Building+an+AI+Chatbot%402x.png?auto=compress,format')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          />
+          
+          <div className="max-w-5xl mx-auto relative z-10">
             {/* Header for mobile & TopNav for desktop */}
             <header className="flex items-center justify-between mb-8">
               <Link to="/" className="md:hidden flex items-center gap-2">
@@ -88,6 +135,9 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/subject/:subjectName" element={<SubjectView />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Routes>
           </div>
         </main>
