@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 }
 const asyncWrap = require('../utils/asyncWrap');
-// const AppError = require('../utils/AppError');
+const AppError = require('../utils/AppError');
 const jwt = require('jsonwebtoken');
 
 const authServices = require('../services/auth.service');

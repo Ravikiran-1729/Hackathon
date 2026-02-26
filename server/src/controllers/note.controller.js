@@ -1,6 +1,7 @@
 // src/controllers/note.controller.js
 const Note = require("../models/Note");
 const Subject = require("../models/Subject");
+const mongoose = require("mongoose");
 
 exports.uploadNotes = async (req, res) => {
     try {
@@ -17,10 +18,18 @@ exports.uploadNotes = async (req, res) => {
         const { subjectName, userId } = req.body;
 
         // ✅ Guard: required fields
-        if (!subjectName || !userId) {
+        if (!subjectName) {
             return res.status(400).json({
                 success: false,
-                message: "subjectName and userId are required"
+                message: "subjectName is required"
+            });
+        }
+
+        // ✅ Guard: userId must be a valid ObjectId
+        if (!userId || userId === "null" || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid or missing userId. Please log in again."
             });
         }
 

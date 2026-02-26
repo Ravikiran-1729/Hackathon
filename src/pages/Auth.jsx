@@ -25,12 +25,20 @@ function Auth() {
 
     try {
       if (isLogin) {
-        // LOGIN - send username, email, password
-        const res = await axios.post("http://localhost:3000/AskMyNotes/login", {
-          username,
-          email,
-          password,
-        });
+        // LOGIN - send username, password
+        const res = await axios.post(
+          "http://localhost:3000/AskMyNotes/login",
+          {
+            username,
+            password,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+        if (res.data?.user?.id) {
+          localStorage.setItem("userId", res.data.user.id);
+        }
         setMessage(res.data.message);
       } else {
         // SIGNUP - send username, email, password, repeat_password
@@ -39,14 +47,23 @@ function Auth() {
           return;
         }
 
-        const res = await axios.post("http://localhost:3000/AskMyNotes/signup", {
-          user: {
-            username,
-            email,
-            password,
-            repeat_password,
+        const res = await axios.post(
+          "http://localhost:3000/AskMyNotes/signup",
+          {
+            user: {
+              username,
+              email,
+              password,
+              repeat_password,
+            },
           },
-        });
+          {
+            withCredentials: true,
+          }
+        );
+        if (res.data?.user?.id) {
+          localStorage.setItem("userId", res.data.user.id);
+        }
         setMessage(res.data.message);
       }
     } catch (err) {

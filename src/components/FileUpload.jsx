@@ -44,10 +44,17 @@ function FileUpload({ subject, onSuccess }) {
     setIsUploading(true);
     setError("");
 
+    const userId = localStorage.getItem("userId");
+    if (!userId || userId === "null") {
+      setIsUploading(false);
+      setError("Please log in again before uploading notes.");
+      return;
+    }
+
     const formData = new FormData();
     files.forEach(f => formData.append("files", f));
     formData.append("subjectName", subject);
-    formData.append("userId", localStorage.getItem("userId")); // adjust if you store userId elsewhere
+    formData.append("userId", userId);
 
     try {
       const res = await fetch("http://localhost:3000/upload/notes/upload", {
@@ -55,9 +62,12 @@ function FileUpload({ subject, onSuccess }) {
         body: formData
       });
 
-      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json().catch(() => null);
 
-      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.message || "Upload failed");
+      }
+
       setUploadedFiles(data.noteIds);
       setFiles([]);
       if (onSuccess) onSuccess(data.noteIds);

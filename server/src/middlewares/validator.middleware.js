@@ -5,7 +5,11 @@ const validateUserSchema = (req, res, next) =>{
 
     if(error){
         console.log(error.details);
-        return res.redirect('/auth/signup');
+        return res.status(400).json({
+            success: false,
+            message: error.details[0]?.message || "Validation error",
+            errors: error.details.map(d => d.message),
+        });
     }
     next();
 }
